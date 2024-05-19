@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BeyondChats Assignment</title>
+    <style>
+        /* Styles for the intro page */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .assignment-info {
+            margin-bottom: 30px;
+        }
+        .assignment-info h2 {
+            color: #666;
+            margin-top: 0;
+        }
+        .assignment-info p {
+            margin: 10px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #555;
+        }
+
+        /* Styles for the result display page */
+        h2 {
+            color: #666;
+            margin-top: 40px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ccc;
+        }
+        h3 {
+            color: #999;
+            margin-top: 30px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        li:hover {
+            transform: translateY(-5px);
+        }
+        p {
+            margin: 10px 0;
+        }
+        .pagination {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .pagination a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #fff;
+            text-decoration: none;
+            color: #333;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .pagination a:hover {
+            background-color: #f0f0f0;
+        }
+        .pagination a.active {
+            background-color: #333;
+            color: #fff;
+        }
+        .empty-statement {
+            color: #999;
+            font-style: italic;
+            margin-top: 30px;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px dotted #fff;
+            transition: border-bottom 0.3s ease;
+        }
+        .footer a:hover {
+            border-bottom: 1px solid #fff;
+        }
+        .footer .separator {
+            margin: 0 10px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="intro-page">
+            <h1>BeyondChats Assignment</h1>
+            <div class="assignment-info">
+                <h2>Task Overview</h2>
+                <p>The task was to develop a Python program that fetches data from a paginated API, identifies whether the response for each response-sources pair came from any of the sources, lists down the sources from which the response was formed, and returns the citations for all objects coming from the API.</p>
+
+                <h2>Provided Resources</h2>
+                <p>The following resources were provided for the assignment:</p>
+                <ul>
+                    <li>API endpoint: <a href="https://devapi.beyondchats.com/api/get_message_with_sources">https://devapi.beyondchats.com/api/get_message_with_sources</a></li>
+                </ul>
+
+                <h2>Requirements</h2>
+                <p>The assignment required the following steps to be performed:</p>
+                <ol>
+                    <li>Fetch the data from the pages of the API.</li>
+                    <li>Identify whether the response for each response-sources pair came from any of the sources.</li>
+                    <li>List down the sources from which the response was formed, or return an empty array if the response did not come from any source.</li>
+                    <li>Return the citations for all objects coming from the API.</li>
+                    <li>(Extra points) Present the solution through a user-friendly UI.</li>
+                </ol>
+
+                <h2>Solution Approach</h2>
+                <p>Following are the steps used for the solution:
+                    <ol>
+                        <li>First fetching all the page links from the API.</li>
+                        <li>Iterating over all the pages and getting all the source statements and their contexts.</li>
+                        <li>Finding similarity between the source statement and the context statements. For finding the similarity between the source statement and all the context statments, <a href="https://huggingface.co/sentence-transformers/all-mpnet-base-v2">all-mpnet-base-v2</a>, a transformers based model has been used.</li>
+                        <li>After getting the results from the model, the context statements are filtered out.</li>
+                        <li>The result for all of the pages are then stored in the results.json file which is then used to display the results.</li>
+                    </ol>
+                    </p>
+            </div>
+            <a href="#" class="button" onclick="showResultsPage(); return false;">View Results</a>
+        </div>
+        <div id="results-page" style="display: none;">
+            <h1>Results</h1>
+            {% for page, qa_list in data.items() %}
+                <div id="page-{{ loop.index }}" style="display: none;">
+                    <h2>{{ page }}</h2>
+                    {% for qa, details in qa_list.items() %}
+                        <h3>{{ qa }}</h3>
+                        {% if details %}
+                            <ul>
+                                {% for detail in details %}
+                                    <li>
+                                        <p><strong>id:</strong> {{ detail.id }}</p>
+                                        <p><strong>context:</strong> {{ detail.context }}</p>
+                                        <p><strong>link:</strong> <a href="{{ detail.link }}" target="_blank">{{ detail.link }}</a></p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="empty-statement">No details available for this statement.</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="pagination">
+                {% for page in data.keys() %}
+                    <a href="#" onclick="showPage({{ loop.index }})">{{ loop.index }}</a>
+                {% endfor %}
+            </div>
+
+            <div class="footer">
+                <p><b>Tech Stack:</b> Python <span class="separator">|</span> Flask <span class="separator">|</span> HTML <span class="separator">|</span> CSS <span class="separator">|</span> JavaScript</p>
+                <p><b>Model:</b> <a href="https://huggingface.co/sentence-transformers/all-mpnet-base-v2" target="_blank">all-mpnet-base-v2</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showResultsPage() {
+            document.getElementById('intro-page').style.display = 'none';
+            document.getElementById('results-page').style.display = 'block';
+        }
+
+        function showPage(pageNumber) {
+            var pages = document.querySelectorAll('[id^="page-"]');
+            pages.forEach(function(page) {
+                page.style.display = 'none';
+            });
+            document.getElementById('page-' + pageNumber).style.display = 'block';
+
+            var pagination = document.querySelectorAll('.pagination a');
+            pagination.forEach(function(link) {
+                link.classList.remove('active');
+            });
+            pagination[pageNumber - 1].classList.add('active');
+        }
+
+        // Show the first page by default
+        showPage(1);
+    </script>
+</body>
+</html>
