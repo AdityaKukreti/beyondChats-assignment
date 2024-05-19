@@ -4,10 +4,6 @@ from beyondChats import BeyondChats
 app = Flask(__name__)
 beyondChats = BeyondChats()
 
-# try:
-    # data = beyondChats.getPageCitations()
-# except:
-
 
 # for viewing the results after calculating the results right now
 # data = beyondChats.getNewPageCitations()
