@@ -1,6 +1,8 @@
 <h1>Instructions for running the assignment</h1>
-<h2>Prerequisite</h2>
+<h2>Prerequisites</h2>
 Python Interpreter
+Flask
+Requests
 <br>
 <h2>Instructions</h2>
 <ol>
